@@ -22,8 +22,9 @@ build/
 # Linting
 .ruff_cache/
 
-# Data (runtime - don't track)
-data/
+# Data (runtime - don't track top-level data dir, but allow code in backend/app/data/)
+/data/
+chroma_db/
 
 # Docker
 docker-compose.override.yml
