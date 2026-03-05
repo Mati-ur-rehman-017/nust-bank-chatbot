@@ -52,6 +52,9 @@ class ChatService:
         results = await self.retrieval.retrieve(message)
 
         context_texts = [r.text for r in results]
+        print(f"[DEBUG] Retrieved {len(context_texts)} context chunks:")
+        for i, ctx in enumerate(context_texts):
+            print(f"[DEBUG] Context {i + 1}:\n{ctx[:200]}...")
         system, user_query = build_prompt(message, context_texts)
 
         logger.info(
