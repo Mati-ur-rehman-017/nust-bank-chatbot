@@ -1,1 +1,132 @@
 @import "tailwindcss";
+
+/* ChatGPT Dark Theme Custom Properties */
+:root {
+  --color-main-bg: #343541;
+  --color-sidebar-bg: #202123;
+  --color-message-assistant-bg: #444654;
+  --color-message-user-bg: #343541;
+  --color-text-primary: #ececf1;
+  --color-text-secondary: #c5c5d2;
+  --color-text-muted: #8e8ea0;
+  --color-border: #4e4f60;
+  --color-input-bg: #40414f;
+  --color-input-border: #565869;
+  --color-accent: #10b981;
+  --color-accent-hover: #059669;
+}
+
+/* Base styles */
+body {
+  background-color: var(--color-main-bg);
+  color: var(--color-text-primary);
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-main-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* Syntax highlighting overrides for dark theme */
+pre code.hljs {
+  padding: 1rem !important;
+  border-radius: 0.5rem;
+}
+
+/* Markdown content styling */
+.markdown-content {
+  line-height: 1.75;
+}
+
+.markdown-content p {
+  margin-bottom: 1rem;
+}
+
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.markdown-content li {
+  margin-bottom: 0.25rem;
+}
+
+.markdown-content code:not(pre code) {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+.markdown-content pre {
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid var(--color-border);
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.markdown-content a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.markdown-content a:hover {
+  color: var(--color-accent-hover);
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.markdown-content h1:first-child,
+.markdown-content h2:first-child,
+.markdown-content h3:first-child,
+.markdown-content h4:first-child {
+  margin-top: 0;
+}
+
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.markdown-content th {
+  background-color: rgba(0, 0, 0, 0.2);
+}

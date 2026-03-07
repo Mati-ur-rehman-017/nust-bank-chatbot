@@ -1,6 +1,8 @@
 import { useCallback, useRef, useState } from "react";
 import { sendChatStream } from "../services/api";
-import type { Message, Source } from "../types";
+import type { Message, MessageHistoryItem, Source } from "../types";
+
+const MAX_HISTORY_MESSAGES = 5;
 
 let nextId = 0;
 function genId(): string {
@@ -14,6 +16,17 @@ const WELCOME_MESSAGE: Message = {
   content:
     "Hello! I'm the NUST Bank Assistant. How can I help you today? You can ask me about account services, funds transfer, mobile banking, and more.",
 };
+
+/**
+ * Extract the last N completed messages as history items for the API.
+ * Excludes currently streaming messages and the welcome message.
+ */
+function getHistoryFromMessages(messages: Message[]): MessageHistoryItem[] {
+  return messages
+    .filter((m) => !m.isStreaming && m.id !== "welcome")
+    .slice(-MAX_HISTORY_MESSAGES)
+    .map((m) => ({ role: m.role, content: m.content }));
+}
 
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
@@ -33,6 +46,9 @@ export function useChat() {
         isStreaming: true,
       };
 
+      // Get history before adding the new messages
+      const history = getHistoryFromMessages(messages);
+
       setMessages((prev) => [...prev, userMsg, botMsg]);
       setIsStreaming(true);
       abortRef.current = false;
@@ -42,6 +58,7 @@ export function useChat() {
       try {
         await sendChatStream(
           text,
+          history,
           (token) => {
             if (abortRef.current) return;
             setMessages((prev) =>
@@ -91,8 +108,18 @@ export function useChat() {
         setIsStreaming(false);
       }
     },
-    [isStreaming],
+    [isStreaming, messages],
   );
 
-  return { messages, isStreaming, sendMessage };
+  const stopStreaming = useCallback(() => {
+    abortRef.current = true;
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.isStreaming ? { ...m, isStreaming: false } : m,
+      ),
+    );
+    setIsStreaming(false);
+  }, []);
+
+  return { messages, isStreaming, sendMessage, stopStreaming };
 }

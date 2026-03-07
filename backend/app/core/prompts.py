@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.schemas import MessageItem
+
 SYSTEM_PROMPT = """\
 You are a helpful customer service assistant for NUST Bank.
 
@@ -33,8 +38,30 @@ inquiries such as:
 Is there anything related to NUST Bank I can help you with?"""
 
 
-def build_prompt(query: str, context_docs: list[str]) -> tuple[str, str]:
+def format_history(history: list["MessageItem"]) -> str:
+    """Format conversation history into a string for the prompt."""
+    if not history:
+        return ""
+
+    formatted_lines = ["CONVERSATION HISTORY:"]
+    for msg in history:
+        role_label = "User" if msg.role == "user" else "Assistant"
+        formatted_lines.append(f"{role_label}: {msg.content}")
+
+    return "\n".join(formatted_lines) + "\n\n"
+
+
+def build_prompt(
+    query: str,
+    context_docs: list[str],
+    history: list["MessageItem"] | None = None,
+) -> tuple[str, str]:
     """Build a (system, user) prompt pair from retrieved context documents.
+
+    Args:
+        query: The current user query.
+        context_docs: List of retrieved context document texts.
+        history: Optional list of previous messages in the conversation.
 
     Returns:
         A tuple of ``(system_prompt, user_query)`` ready for the LLM.
@@ -46,4 +73,9 @@ def build_prompt(query: str, context_docs: list[str]) -> tuple[str, str]:
         context = "No relevant context found."
 
     system = SYSTEM_PROMPT.format(context=context)
-    return system, query
+
+    # Build user prompt with history context if available
+    history_text = format_history(history or [])
+    user_prompt = f"{history_text}Current question: {query}"
+
+    return system, user_prompt

@@ -17,6 +17,11 @@ export interface Message {
   isStreaming?: boolean;
 }
 
+export interface MessageHistoryItem {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export interface Document {
   id: string;
   filename: string;

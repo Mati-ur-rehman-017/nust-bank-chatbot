@@ -23,10 +23,14 @@ async def chat(
 ) -> ChatResponse:
     """Accept a user message and return a complete RAG-powered response."""
 
-    logger.info("Chat request: %s", request.message[:80])
+    logger.info(
+        "Chat request: %s (history: %d messages)",
+        request.message[:80],
+        len(request.history),
+    )
 
     try:
-        return await service.chat(request.message)
+        return await service.chat(request.message, request.history)
     except Exception as exc:
         logger.exception("Chat generation failed")
         raise HTTPException(
@@ -42,11 +46,15 @@ async def chat_stream(
 ) -> StreamingResponse:
     """Accept a user message and stream back tokens via SSE."""
 
-    logger.info("Stream request: %s", request.message[:80])
+    logger.info(
+        "Stream request: %s (history: %d messages)",
+        request.message[:80],
+        len(request.history),
+    )
 
     async def event_generator() -> AsyncGenerator[str, None]:
         try:
-            async for token in service.chat_stream(request.message):
+            async for token in service.chat_stream(request.message, request.history):
                 payload = json.dumps({"token": token})
                 yield f"data: {payload}\n\n"
             yield "data: [DONE]\n\n"

@@ -1,12 +1,15 @@
-import type { ChatResponse } from "../types";
+import type { ChatResponse, MessageHistoryItem } from "../types";
 
 const API_BASE = "/api";
 
-export async function sendChat(message: string): Promise<ChatResponse> {
+export async function sendChat(
+  message: string,
+  history: MessageHistoryItem[] = [],
+): Promise<ChatResponse> {
   const response = await fetch(`${API_BASE}/chat/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ message, history }),
   });
 
   if (!response.ok) {
@@ -19,6 +22,7 @@ export async function sendChat(message: string): Promise<ChatResponse> {
 
 export async function sendChatStream(
   message: string,
+  history: MessageHistoryItem[],
   onToken: (token: string) => void,
   onDone: () => void,
   onError: (error: string) => void,
@@ -26,7 +30,7 @@ export async function sendChatStream(
   const response = await fetch(`${API_BASE}/chat/stream`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ message, history }),
   });
 
   if (!response.ok) {
