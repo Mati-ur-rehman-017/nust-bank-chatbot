@@ -12,10 +12,20 @@ _BACKEND_ROOT = _SCRIPT_DIR.parent
 if str(_BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(_BACKEND_ROOT))
 
-from app.config import settings
-from app.data.preprocessing import chunk_document, load_documents, Document
-from app.data.vectorstore import VectorStore
-from app.services.embedding import EmbeddingService
+from app.data.preprocessing import Document, chunk_document, load_documents_from_path
+
+ALLOWED_EXTENSIONS = {".json", ".csv", ".xlsx", ".xls", ".txt"}
+
+
+def should_ingest_file(path: Path) -> bool:
+    name = path.name.strip()
+    if not name:
+        return False
+    if name.startswith(".~lock.") or name.endswith("#"):
+        return False
+    if name.startswith("."):
+        return False
+    return path.suffix.lower() in ALLOWED_EXTENSIONS
 
 
 def _collect_documents(
@@ -25,11 +35,20 @@ def _collect_documents(
     for source in paths:
         if not source.exists():
             continue
-        documents.extend(load_documents(source))
+        for candidate in sorted(source.glob("*")):
+            if not candidate.is_file():
+                continue
+            if not should_ingest_file(candidate):
+                continue
+            documents.extend(load_documents_from_path(candidate))
     return documents
 
 
 def main() -> None:
+    from app.config import settings
+    from app.data.vectorstore import VectorStore
+    from app.services.embedding import EmbeddingService
+
     document_roots = (Path("./data"), Path("./rag_data"))
     documents = _collect_documents(document_roots)
     embedding_service = EmbeddingService(model_name=settings.embedding_model)
