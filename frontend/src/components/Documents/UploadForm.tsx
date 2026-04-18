@@ -13,7 +13,7 @@ export function UploadForm({ onUpload, isLoading }: UploadFormProps) {
   }>({ type: null, message: "" });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const ALLOWED_EXTENSIONS = [".json", ".csv", ".xlsx", ".xls", ".txt"];
+  const ALLOWED_EXTENSIONS = [".json", ".csv", ".xlsx", ".xls", ".txt", ".pdf"];
   const MAX_SIZE_MB = 10;
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -125,7 +125,7 @@ export function UploadForm({ onUpload, isLoading }: UploadFormProps) {
               Drag & drop files here, or click to browse
             </p>
             <p className="mt-1 text-xs text-[#8e8ea0]">
-              Supports JSON, CSV, XLSX, and text files (max {MAX_SIZE_MB}MB)
+              Supports JSON, CSV, XLSX, text, and PDF files (max {MAX_SIZE_MB}MB)
             </p>
           </>
         )}

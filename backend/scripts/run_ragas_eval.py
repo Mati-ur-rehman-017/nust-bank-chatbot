@@ -66,13 +66,24 @@ def load_qa_pairs_from_xlsx(path: Path) -> list[tuple[str, str]]:
 
 
 def load_qa_pairs(
-    source: str, qa_json_path: Path, qa_xlsx_path: Path
+    source: str,
+    qa_json_path: Path,
+    qa_xlsx_path: Path,
+    *,
+    json_limit: int,
+    xlsx_limit: int,
 ) -> list[tuple[str, str]]:
     pairs: list[tuple[str, str]] = []
     if source in {"json", "both"}:
-        pairs.extend(load_qa_pairs_from_json(qa_json_path))
+        json_pairs = load_qa_pairs_from_json(qa_json_path)
+        if json_limit > 0:
+            json_pairs = json_pairs[:json_limit]
+        pairs.extend(json_pairs)
     if source in {"xlsx", "both"}:
-        pairs.extend(load_qa_pairs_from_xlsx(qa_xlsx_path))
+        xlsx_pairs = load_qa_pairs_from_xlsx(qa_xlsx_path)
+        if xlsx_limit > 0:
+            xlsx_pairs = xlsx_pairs[:xlsx_limit]
+        pairs.extend(xlsx_pairs)
 
     deduped: list[tuple[str, str]] = []
     seen: set[tuple[str, str]] = set()
@@ -140,6 +151,18 @@ def main() -> None:
         help="Source of QA pairs for evaluation",
     )
     parser.add_argument(
+        "--json-limit",
+        type=int,
+        default=0,
+        help="Max JSON QA samples to include (0 = all)",
+    )
+    parser.add_argument(
+        "--xlsx-limit",
+        type=int,
+        default=0,
+        help="Max XLSX QA samples to include (0 = all)",
+    )
+    parser.add_argument(
         "--output",
         default="/app/data/ragas_eval_result.json",
         help="Where to write JSON output",
@@ -162,6 +185,8 @@ def main() -> None:
         source=args.qa_source,
         qa_json_path=Path(args.qa_file),
         qa_xlsx_path=Path(args.qa_xlsx_file),
+        json_limit=args.json_limit,
+        xlsx_limit=args.xlsx_limit,
     )
     if not qa_pairs:
         raise RuntimeError("No QA pairs found in dataset.")

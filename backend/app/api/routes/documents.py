@@ -50,6 +50,7 @@ async def upload_document(
     - CSV (.csv)
     - Excel (.xlsx, .xls)
     - Plain text (.txt)
+    - PDF (.pdf, text-based)
 
     The document will be:
     1. Validated for format and size

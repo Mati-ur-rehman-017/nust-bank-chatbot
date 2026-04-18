@@ -25,7 +25,7 @@ from app.services.embedding import EmbeddingService
 logger = logging.getLogger(__name__)
 
 # Allowed file extensions for upload
-ALLOWED_EXTENSIONS = {".json", ".csv", ".xlsx", ".xls", ".txt"}
+ALLOWED_EXTENSIONS = {".json", ".csv", ".xlsx", ".xls", ".txt", ".pdf"}
 MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10MB
 
 

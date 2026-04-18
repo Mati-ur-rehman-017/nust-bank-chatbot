@@ -12,6 +12,11 @@ from typing import Iterable
 import pandas as pd
 import numpy as np
 
+try:
+    from pypdf import PdfReader
+except ImportError:  # pragma: no cover - exercised via runtime error path.
+    PdfReader = None
+
 WORD_CHUNK_SIZE = 800
 WORD_CHUNK_OVERLAP = 200
 QA_CHUNK_SIZE = 900
@@ -76,8 +81,40 @@ def load_documents_from_path(path: Path) -> list[Document]:
             return _load_from_dataframe(path, pd.read_csv)
         case ".xlsx" | ".xls":
             return _load_from_excel(path)
+        case ".pdf":
+            return _load_from_pdf(path)
         case _:
             return _load_plain_text(path)
+
+
+def _load_from_pdf(path: Path) -> list[Document]:
+    if PdfReader is None:
+        raise RuntimeError(
+            "PDF support requires pypdf. Install it in backend dependencies."
+        )
+
+    try:
+        reader = PdfReader(str(path))
+    except Exception:
+        return []
+
+    documents: list[Document] = []
+    for page_index, page in enumerate(reader.pages):
+        text = (page.extract_text() or "").strip()
+        if not text:
+            continue
+        documents.append(
+            Document(
+                id=f"{path.stem}:pdf:p{page_index}",
+                text=text,
+                metadata={
+                    "source": path.name,
+                    "type": "pdf",
+                    "page": str(page_index + 1),
+                },
+            )
+        )
+    return documents
 
 
 def _load_from_json(path: Path) -> list[Document]:

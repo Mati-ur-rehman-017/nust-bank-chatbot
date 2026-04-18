@@ -62,7 +62,7 @@ llm/
 
 ## Data Ingestion
 
-Place documents in `rag_data/` directory (supports JSON, CSV, XLSX, plain text), then run:
+Place documents in `rag_data/` directory (supports JSON, CSV, XLSX, PDF, plain text), then run:
 
 ```bash
 docker compose exec backend python scripts/ingest_data.py
@@ -110,17 +110,8 @@ cd backend
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-## Implementation Progress
-
-- [x] Phase 1: Foundation (FastAPI, config, Docker)
-- [x] Phase 2: Data Pipeline (preprocessing, ChromaDB, embeddings, ingestion)
-- [ ] Phase 3: RAG System (retrieval, prompts, LLM client)
-- [ ] Phase 4: Guard Rails (safety, jailbreak detection)
-- [ ] Phase 5: Document Management (upload API)
-- [ ] Phase 6: Frontend (React chat UI)
 
 ## Notes
 
 - All configuration is centralized in `app.config.Settings`
 - Embedding model is cached in a Docker volume to avoid re-downloads
-- Python files must remain under 300 lines
